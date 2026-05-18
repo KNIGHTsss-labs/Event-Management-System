@@ -26,4 +26,8 @@ export default defineEventHandler(async (event) => {
         conditions.push(gte(events.date, today), lte(events.date ,tomorrow))
     } else if (q.status === 'past')
         conditions.push(lte(events.date, new Date()))
+
+    // sorting
+    const sortCol = q.sortBy === 'registeredCount' ? events.registeredCount : events.date
+    const order = q.order === 'desc' ? desc(sortCol) : asc(sortCol)
 })
