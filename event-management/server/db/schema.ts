@@ -9,3 +9,7 @@ export const events = pgTable('events', {
   maxParticipants:  integer('max_participants'),
   registeredCount:  integer('registered_count').default(0).notNull(),
 })
+
+// Drizzle-inferred DB row type — used only inside server/
+export type EventRow = typeof events.$inferSelect
+export type NewEventRow = typeof events.$inferInsert
