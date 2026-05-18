@@ -9,4 +9,11 @@ export default defineEventHandler(async (event) => {
     // search event name
     if (q.name)
         conditions.push(ilike(events.name, `%${q.name}%`))
+
+    // date filter
+    if (q.date) {
+        const d = new Date(q.date as string)
+        const next = new Date(d); next.setDate(d.getDate() + 1)
+        conditions.push(gte(events.date, d), lte(events.date, next))
+    }
 })
