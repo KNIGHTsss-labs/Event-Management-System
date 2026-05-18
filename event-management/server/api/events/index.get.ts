@@ -16,4 +16,14 @@ export default defineEventHandler(async (event) => {
         const next = new Date(d); next.setDate(d.getDate() + 1)
         conditions.push(gte(events.date, d), lte(events.date, next))
     }
+
+    // status filter
+    if (q.status === 'upcoming')
+        conditions.push(gte(events.date, new Date()))
+    else if (q.status === 'today') {
+        const today = new Date(); today.setHours(0,0,0,0)
+        const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1)
+        conditions.push(gte(events.date, today), lte(events.date ,tomorrow))
+    } else if (q.status === 'past')
+        conditions.push(lte(events.date, new Date()))
 })
