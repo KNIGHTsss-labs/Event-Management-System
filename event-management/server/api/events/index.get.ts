@@ -30,4 +30,8 @@ export default defineEventHandler(async (event) => {
     // sorting
     const sortCol = q.sortBy === 'registeredCount' ? events.registeredCount : events.date
     const order = q.order === 'desc' ? desc(sortCol) : asc(sortCol)
+
+    return db.select().from(events)
+    .where(and(...conditions))
+    .orderBy(order)
 })
