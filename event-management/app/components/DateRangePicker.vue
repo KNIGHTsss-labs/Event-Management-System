@@ -37,14 +37,14 @@ function clear() {
           :value="inputValue.start"
           v-on="inputEvents.start"
           placeholder="From date"
-          class="border rounded-lg px-3 py-2 text-sm w-32"
+          class="border rounded-lg mt-3 px-3 py-2 text-sm w-32"
         />
         <span class="text-gray-400">→</span>
         <input
           :value="inputValue.end"
           v-on="inputEvents.end"
           placeholder="To date"
-          class="border rounded-lg px-3 py-2 text-sm w-32"
+          class="border rounded-lg mt-3 px-3 py-2 text-sm w-32"
         />
 
         <button
