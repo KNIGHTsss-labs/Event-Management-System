@@ -1,38 +1,36 @@
 <script setup lang="ts">
-// 1. เรียกใช้งาน Composable ศูนย์บัญชาการที่เราทำกันไว้
 const { 
   events, 
+  meta,          // ← add this
   filters, 
   refresh, 
   deleteEvent, 
   updateCount 
 } = useEvents()
 
-// 2. ฟังก์ชันสำหรับลบข้อมูล
 async function onDelete(id: string) {
   if (confirm('คุณแน่ใจใช่ไหมว่าจะลบกิจกรรมนี้?')) {
     await deleteEvent(id)
-    refresh() // โหลดข้อมูลใหม่หลังจากลบเสร็จ
+    refresh()
   }
 }
 
-// 3. 🌟 ส่วนที่เพิ่มเข้ามา: จัดการระบบ Modal (ข้อ 5) สำหรับสร้าง/แก้ไข
 const isModalOpen = ref(false)
-const selectedEvent = ref<AppEvent | null>(null) // เก็บข้อมูลงานที่กำลังจะกดแก้ไข
+const selectedEvent = ref<AppEvent | null>(null)
 
 function openCreateModal() {
-  selectedEvent.value = null // เคลียร์เป็น null แปลว่าเป็นการ "สร้างใหม่"
+  selectedEvent.value = null
   isModalOpen.value = true
 }
 
 function openEdit(eventData: AppEvent) {
-  selectedEvent.value = eventData // ใส่ข้อมูลงานตัวนี้เข้าไป แปลว่าเป็นการ "แก้ไข"
+  selectedEvent.value = eventData
   isModalOpen.value = true
 }
 
 function handleFormSuccess() {
   isModalOpen.value = false
-  refresh() // รีเฟรชข้อมูลบนหน้าจอเมื่อกดเซฟเสร็จ
+  refresh()
 }
 </script>
 
@@ -51,6 +49,15 @@ function handleFormSuccess() {
 
     <FilterBar v-model="filters" />
 
+    <!-- ← add DateRangePicker below FilterBar -->
+    <DateRangePicker
+      class="mt-3"
+      :from="filters.dateFrom ?? ''"
+      :to="filters.dateTo ?? ''"
+      @update:from="filters.dateFrom = $event; filters.date = ''"
+      @update:to="filters.dateTo = $event"
+    />
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
       <EventCard
         v-for="e in events" 
@@ -66,6 +73,19 @@ function handleFormSuccess() {
       ไม่พบกิจกรรมที่คุณกำลังค้นหา
     </div>
 
+    <!-- ← add Pagination below the grid -->
+    <AppPagination
+      v-if="meta && meta.totalPages > 1"
+      :page="meta.page"
+      :total-pages="meta.totalPages"
+      @update:page="filters.page = $event"
+    />
+
+    <!-- ← optional: total count -->
+    <p v-if="meta" class="text-center text-sm text-gray-400 mt-3">
+      ทั้งหมด {{ meta.total }} กิจกรรม
+    </p>
+
     <EventForm
       v-if="isModalOpen"
       :event="selectedEvent"
@@ -73,5 +93,5 @@ function handleFormSuccess() {
       @saved="handleFormSuccess"
     />
 
-    </div>
+  </div>
 </template>
