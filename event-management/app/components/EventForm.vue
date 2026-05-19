@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // 1. นำเข้า Types ที่เราเตรียมไว้ใน Step 1
 import type { AppEvent, CreateEventInput, UpdateEventInput } from '~/types/event'
-import type { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
