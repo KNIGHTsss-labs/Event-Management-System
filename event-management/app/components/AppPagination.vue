@@ -17,7 +17,7 @@ const pages = computed(() => {
 
   const result: (number | '...')[] = []
   arr.forEach((n, i) => {
-    if (i > 0 && n - arr[i-1] > 1) result.push('...')
+    if (i > 0 && n - arr[i-1]! > 1) result.push('...')
     result.push(n)
   })
   return result

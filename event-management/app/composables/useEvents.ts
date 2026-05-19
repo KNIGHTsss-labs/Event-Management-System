@@ -30,6 +30,6 @@ export const useEvents = () => {
   const updateCount = (id: string, delta: 1 | -1) =>
     $fetch<AppEvent>(`/api/events/${id}/participants`, { method: 'PATCH', body: { delta } })
 
-  return { events, filters, refresh,
+  return { events, meta, filters, refresh,
            createEvent, updateEvent, deleteEvent, updateCount }
 }

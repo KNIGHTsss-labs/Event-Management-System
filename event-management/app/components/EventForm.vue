@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // 1. นำเข้า Types ที่เราเตรียมไว้ใน Step 1
 import type { AppEvent, CreateEventInput, UpdateEventInput } from '~/types/event'
-import type { Dialog, DailogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import type { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -26,7 +26,7 @@ const loading = ref(false)
 // 4. ฟังก์ชันส่งข้อมูล
 async function submit() {
   if (isEdit.value)
-    await updateEvent(props.event!.id, { ...from, date: new Date(form.date).toISOString() })
+    await updateEvent(props.event!.id, { ...form, date: new Date(form.date).toISOString() })
   else
     await createEvent({ ...form, date:new Date(form.date).toISOString() })
   emit('saved')

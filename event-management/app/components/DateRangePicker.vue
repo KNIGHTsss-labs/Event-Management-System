@@ -6,7 +6,7 @@ const props = defineProps<{ from: string; to: string }>()
 const emit  = defineEmits(['update:from', 'update:to'])
 
 const range = computed({
-  get: () => ({
+  get: (): any  => ({
     start: props.from ? new Date(props.from) : null,
     end:   props.to   ? new Date(props.to)   : null,
   }),

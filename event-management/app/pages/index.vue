@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AppEvent } from '~/types/event'
 import { Button } from '@/components/ui/button'
 const { 
   events, 
@@ -63,7 +64,7 @@ function handleFormSuccess() {
         :key="e.id"
         :event="e"
         @delete="onDelete(e.id)"
-        @update-count="(d) => updateCount(e.id, d).then(refresh)"
+        @update-count="(d) => updateCount(e.id, d).then(() => refresh())"
         @edit="openEdit(e)"
       />
     </div>
