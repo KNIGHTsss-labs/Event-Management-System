@@ -5,25 +5,32 @@ import 'v-calendar/style.css'
 const props = defineProps<{ from: string; to: string }>()
 const emit  = defineEmits(['update:from', 'update:to'])
 
-const range = computed({
-  get: (): any  => ({
-    start: props.from ? new Date(props.from) : null,
-    end:   props.to   ? new Date(props.to)   : null,
-  }),
-  set: (val: any) => {
-    emit('update:from', val.start ? new Date(val.start).toISOString() : '')
-    emit('update:to',   val.end   ? new Date(val.end).toISOString()   : '')
+const localRange = ref<any>({
+  start: props.from ? new Date(props.from) : null,
+  end:   props.to   ? new Date(props.to)   : null,
+})
+
+watch(() => [props.from, props.to], ([f, t]) => {
+  localRange.value = {
+    start: f ? new Date(f) : null,
+    end:   t ? new Date(t) : null,
   }
 })
 
+watch(localRange, (val) => {
+  emit('update:from', val.start ? new Date(val.start).toISOString() : '')
+  emit('update:to',   val.end   ? new Date(val.end).toISOString()   : '')
+})
+
 function clear() {
-  emit('upddate:from', '')
+  localRange.value = { start: null, end: null }
+  emit('update:from', '')
   emit('update:to', '')
 }
 </script>
 
 <template>
-  <DatePicker v-model.range="range" is-range>
+  <DatePicker v-model.range="localRange" is-range>
     <template #default="{ inputValue, inputEvents }">
       <div class="flex items-center gap-2">
         <input
