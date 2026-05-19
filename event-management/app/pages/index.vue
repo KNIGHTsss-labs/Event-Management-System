@@ -66,5 +66,12 @@ function handleFormSuccess() {
       ไม่พบกิจกรรมที่คุณกำลังค้นหา
     </div>
 
+    <EventForm
+      v-if="isModalOpen"
+      :event="selectedEvent"
+      @close="isModalOpen = false"
+      @saved="handleFormSuccess"
+    />
+
     </div>
 </template>
