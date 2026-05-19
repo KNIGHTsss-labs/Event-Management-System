@@ -1,6 +1,6 @@
 import { db } from '~~/server/db/client'
 import { events } from '~~/server/db/schema'
-import { ilike, eq, gte, lte, and, asc, desc } from 'drizzle-orm'
+import { ilike, gte, lte, and, asc, desc, count } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
     const q = getQuery(event)
@@ -36,7 +36,31 @@ export default defineEventHandler(async (event) => {
     const sortCol = q.sortBy === 'registeredCount' ? events.registeredCount : events.date
     const order = q.order === 'desc' ? desc(sortCol) : asc(sortCol)
 
-    return db.select().from(events)
-    .where(and(...conditions))
-    .orderBy(order)
+    // pagination
+    const page = Math.max(1, Number(q.page) || 1)
+    const limit = Math.min(50, Number(q.limit) || 10)
+    const offset = (page - 1) * limit
+
+    const where = and(...conditions)
+
+    const result = await db.select({ total: count() })
+      .from(events).where(where)
+    const total = result[0]?.total ?? 0
+  
+
+    const data = await db.select().from(events)
+      .where(where)
+      .orderBy(order)
+      .limit(limit)
+      .offset(offset)
+
+    return {
+        data,
+        meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(Number(total) / limit)
+        }
+    }
 })
