@@ -15,7 +15,23 @@ export type UpdateEventInput = Partial<CreateEventInput>
 export interface EventFilters {
   name?: string
   date?: string
+  dateFrom?: string
+  dateTo?: string
   status?: 'upcoming' | 'today' | 'past' | ''
   sortBy?: 'date' | 'registeredCount'
   order?: 'asc' | 'desc'
+  page?: number
+  limit?: number
+}
+
+export interface PaginationMeta {
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export interface EventsResponse {
+  data: AppEvent[]
+  meta: PaginationMeta
 }
