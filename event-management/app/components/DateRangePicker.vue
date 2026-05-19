@@ -15,6 +15,11 @@ const range = computed({
     emit('update:to',   val.end   ? new Date(val.end).toISOString()   : '')
   }
 })
+
+function clear() {
+  emit('upddate:from', '')
+  emit('update:to', '')
+}
 </script>
 
 <template>
@@ -34,6 +39,15 @@ const range = computed({
           placeholder="To date"
           class="border rounded-lg px-3 py-2 text-sm w-32"
         />
+
+        <button
+          v-if="from || to"
+          @click="clear"
+          type="button"
+          class="text-xs text-gray-400 hover:text-red-500 border border-gray-200 rounded-lg p-2 transition"
+        >
+          X ล้าง
+        </button>
       </div>
     </template>
   </DatePicker>
