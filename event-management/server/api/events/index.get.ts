@@ -10,8 +10,13 @@ export default defineEventHandler(async (event) => {
     if (q.name)
         conditions.push(ilike(events.name, `%${q.name}%`))
 
-    // date filter
-    if (q.date) {
+    // date range picker
+    if (q.dateFrom && q.dateTo) {
+        conditions.push(
+            gte(events.date, new Date(q.dateFrom as string)),
+            lte(events.date, new Date(q.dateTo as string))
+        )
+    }else if (q.date) { // date filter
         const d = new Date(q.date as string)
         const next = new Date(d); next.setDate(d.getDate() + 1)
         conditions.push(gte(events.date, d), lte(events.date, next))
