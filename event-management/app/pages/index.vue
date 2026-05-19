@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Button } from '@/components/ui/button'
 const { 
   events, 
   meta,          // ← add this
@@ -40,9 +41,7 @@ function handleFormSuccess() {
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold">ระบบจัดการกิจกรรม (EMS)</h1>
       <button 
-        @click="openCreateModal" 
-        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-      >
+        @click="openCreateModal">
         + สร้างกิจกรรมใหม่
       </button>
     </div>
