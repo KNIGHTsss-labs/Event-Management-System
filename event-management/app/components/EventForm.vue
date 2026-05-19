@@ -1,6 +1,9 @@
 <script setup lang="ts">
 // 1. นำเข้า Types ที่เราเตรียมไว้ใน Step 1
 import type { AppEvent, CreateEventInput, UpdateEventInput } from '~/types/event'
+import type { Dialog, DailogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 const props = defineProps<{ event?: AppEvent | null }>()
 const emit  = defineEmits(['close', 'saved'])
@@ -22,82 +25,54 @@ const loading = ref(false)
 
 // 4. ฟังก์ชันส่งข้อมูล
 async function submit() {
-  loading.value = true
-  try {
-    if (isEdit.value && props.event) {
-      // โหมดแก้ไข: ส่ง ID และข้อมูลที่ต้องการอัปเดต
-      await updateEvent(props.event.id, form as UpdateEventInput)
-    } else {
-      // โหมดสร้างใหม่: ส่งข้อมูลทั้งหมดตาม CreateEventInput
-      await createEvent(form as CreateEventInput)
-    }
-    emit('saved') // บอกให้หน้าหลัก Refresh ข้อมูล
-    emit('close') // ปิด Modal
-  } catch (error) {
-    alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล')
-  } finally {
-    loading.value = false
-  }
+  if (isEdit.value)
+    await updateEvent(props.event!.id, { ...from, date: new Date(form.date).toISOString() })
+  else
+    await createEvent({ ...form, date:new Date(form.date).toISOString() })
+  emit('saved')
 }
 </script>
 
 <template>
-  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-      <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-        <h2 class="text-xl font-bold text-gray-800">
-          {{ isEdit ? 'แก้ไขกิจกรรม' : 'สร้างกิจกรรมใหม่' }}
-        </h2>
-        <button @click="emit('close')" class="text-gray-400 hover:text-gray-600 transition">
-          ✕
-        </button>
+  <Dialog :open="true" @update:open="emit('close')">
+    <DialogContent class="max-w-md">
+      <DialogHeader>
+        <DialogTitle>{{ isEdit ? 'แก้ไขกิจกรรม' : 'สร้างกิจกรรมใหม่' }}</DialogTitle>
+      </DialogHeader>
+
+      <div class="space-y-3 py-2">
+        <div>
+          <label class="text-sm font-medium mb-1 block">ชื่อกิจกรรม *</label>
+          <Input v-model="form.name" placeholder="ระบุชื่อกิจกรรมของคุณ" />
+        </div>
+        <div>
+          <label class="text-sm font-medium mb-1 block">สถานที่ *</label>
+          <Input v-model="form.location" placeholder="ระบุสถานที่จัดงาน/กิจกรรม" />
+        </div>
+        <div>
+          <label class="text-sm font-medium mb-1 block">วันและเวลา *</label>
+          <Input type="datetime-local" v-model="form.date" />
+        </div>
+        <div>
+          <label class="text-sm font-medium mb-1 block">รายละเอียด</label>
+          <Input v-model="form.description" placeholder="รายละเอียด (ไม่บังคับ)" />
+        </div>
+        <div>
+          <label class="text-sm font-medium mb-1 block">จำนวนผู้เข้าร่วมสูงสุด</label>
+          <Input
+            type="number" min="0"
+            :value="form.maxParticipants ?? ''"
+            @input="form.maxParticipants = ($event.target as HTMLInputElement).value
+              ? Number(($event.target as HTMLInputElement).value) : null"
+            placeholder="ไม่ระบุ = ไม่จำกัด"
+          />
+        </div>
       </div>
 
-      <form @submit.prevent="submit" class="p-6 space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อกิจกรรม *</label>
-          <input v-model="form.name" type="text" required placeholder="ระบุชื่อกิจกรรมของคุณ"
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none" />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">รายละเอียด</label>
-          <textarea v-model="form.description" rows="3" placeholder="ระบุรายละเอียดกิจกรรมสั้นๆ"
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">วันที่และเวลา *</label>
-            <input v-model="form.date" type="datetime-local" required
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">จำนวนที่รับ (คน)</label>
-            <input v-model.number="form.maxParticipants" type="number" placeholder="ไม่ระบุ = ไม่จำกัด"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none" />
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">สถานที่ *</label>
-          <input v-model="form.location" type="text" required placeholder="ระบุสถานที่จัดงาน"
-            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none" />
-        </div>
-
-        <div class="flex gap-3 pt-4">
-          <button type="button" @click="emit('close')"
-            class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition">
-            ยกเลิก
-          </button>
-          <button type="submit" :disabled="loading"
-            class="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-blue-400 transition flex justify-center items-center">
-            <span v-if="loading" class="animate-spin mr-2">◌</span>
-            {{ isEdit ? 'อัปเดตข้อมูล' : 'สร้างกิจกรรม' }}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
+      <DialogFooter class="gap-2">
+        <Button variant="outline" @click="emit('close')">ยกเลิก</Button>
+        <Button @click="submit">{{ isEdit ? 'อัปเดตข้อมูล' : 'สร้างกิจกรรม' }}</Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
 </template>
