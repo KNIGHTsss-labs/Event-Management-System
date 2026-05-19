@@ -1,16 +1,22 @@
-import type { AppEvent, CreateEventInput, UpdateEventInput, EventFilters } from '~~/app/types/event'
+import type { AppEvent, CreateEventInput, UpdateEventInput, EventFilters, EventsResponse } from '~~/app/types/event'
 
 export const useEvents = () => {
   const filters = reactive<EventFilters>({
-    name: '', date: '', status: '',
-    sortBy: 'date', order: 'asc'
+    name: '', date: '', dateFrom: '', dateTo: '',
+    status: '', sortBy: 'date', order: 'asc',
+    page: 1, limit: 10
   })
 
-  const { data: events, refresh } = useFetch<AppEvent[]>('/api/events', {
+  const { data: response, refresh } = useFetch<EventsResponse>('/api/events', {
     query: filters,
     watch: [filters],
-    default: () => []
+    default: () => ({ data: [], meta: { total: 0, page: 1, limit: 10, totalPages: 1 } })
   })
+
+  const events = computed(() => response.value?.data ?? [])
+  const meta   = computed(() => response.value?.meta)
+
+  watch(() => ({ ...filters, page: undefined }), () => { filters.page = 1 })
 
   const createEvent = (body: CreateEventInput) =>
     $fetch<AppEvent>('/api/events', { method: 'POST', body })
