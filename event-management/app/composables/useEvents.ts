@@ -16,7 +16,17 @@ export const useEvents = () => {
   const events = computed(() => response.value?.data ?? [])
   const meta   = computed(() => response.value?.meta)
 
-  watch(() => ({ ...filters, page: undefined }), () => { filters.page = 1 })
+  watch(() => ({ 
+    name: filters.name,
+    date: filters.date,
+    dateFrom: filters.dateFrom,
+    dateTo: filters.dateTo,
+    status: filters.status,
+    sortBy: filters.sortBy,
+    order: filters.order,
+  }), 
+  () => { filters.page = 1 }
+)
 
   const createEvent = (body: CreateEventInput) =>
     $fetch<AppEvent>('/api/events', { method: 'POST', body })
