@@ -10,9 +10,9 @@ const filters = defineModel<EventFilters>({ required: true })
 
 <template>
   <div class="flex flex-col sm:flex-row flex-wrap gap-3 bg-gray-50 p-4 rounded-xl border border-gray-100">
-    
+
     <div class="flex-1 min-w-[200px]">
-      <input 
+      <Input 
         v-model="filters.name" 
         placeholder="🔍 ค้นหาด้วยชื่อกิจกรรม..."
       />
@@ -42,7 +42,8 @@ const filters = defineModel<EventFilters>({ required: true })
       <option value="registeredCount">เรียงตามจำนวนผู้สมัคร</option>
     </select>
 
-    <button 
+    <Button 
+      variant="outline"
       @click="filters.order = filters.order === 'asc' ? 'desc' : 'asc'">
       <span v-if="filters.order === 'asc'" class="text-blue-600">▲ น้อยไปมาก</span>
       <span v-else class="text-red-500">▼ มากไปน้อย</span>
