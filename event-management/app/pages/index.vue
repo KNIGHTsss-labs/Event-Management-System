@@ -1,20 +1,34 @@
 <script setup lang="ts">
 import type { AppEvent } from '~/types/event'
 import { Button } from '@/components/ui/button'
-const { 
-  events, 
-  meta,          // ← add this
-  filters, 
-  refresh, 
-  deleteEvent, 
-  updateCount 
+import { 
+  AlertDialog, AlertDialogContent, AlertDialogHeader,
+  AlertDialogTitle, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogCancel, AlertDialogAction} from '@/components/ui/alert-dialog'
+const {
+  events,
+  meta,
+  filters,
+  refresh,
+  deleteEvent,
+  updateCount
 } = useEvents()
 
-async function onDelete(id: string) {
-  if (confirm('คุณแน่ใจใช่ไหมว่าจะลบกิจกรรมนี้?')) {
-    await deleteEvent(id)
-    refresh()
-  }
+//delete confirm state 
+const isDeleteOpen = ref(false)
+const deleteTargetId = ref<string | null>(null)
+
+function onDelete(id: string) {
+  deleteTargetId.value = id
+  isDeleteOpen.value = true
+}
+
+async function confirmDelete() {
+  if (!deleteTargetId.value) return
+  await deleteEvent(deleteTargetId.value)
+  deleteTargetId.value = null
+  isDeleteOpen.value = false
+  refresh()
 }
 
 const isModalOpen = ref(false)
@@ -107,4 +121,22 @@ function handleFormSuccess() {
     @close="isModalOpen = false"
     @saved="handleFormSuccess"
   />
+
+  <AlertDialog :open="isDeleteOpen" @update:open="isDeleteOpen = $event">
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle>ยืนยันการลบกิจกรรม</AlertDialogTitle>
+        <AlertDialogDescription>
+          คุณแน่ใจหรือไม่? การลบนี้ไม่สามารถย้อนกลับได้
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel @click="isDeleteOpen = false">ยกเลิก</AlertDialogCancel>
+        <AlertDialogAction @click="confirmDelete"
+          class="bg-red-600 hover:bg-red-700 text-white">
+          ลบกิจกรรม
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
 </template>
