@@ -16,7 +16,8 @@ export const useEvents = () => {
   const events = computed(() => response.value?.data ?? [])
   const meta   = computed(() => response.value?.meta)
 
-  watch(() => ({ 
+  watch(
+    () => ({ 
     name: filters.name,
     date: filters.date,
     dateFrom: filters.dateFrom,
@@ -24,8 +25,11 @@ export const useEvents = () => {
     status: filters.status,
     sortBy: filters.sortBy,
     order: filters.order,
-  }), 
-  () => { filters.page = 1 }
+  }),
+  async () => {
+    await nextTick()
+    filters.page = 1
+  }
 )
 
   const createEvent = (body: CreateEventInput) =>

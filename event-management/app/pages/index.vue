@@ -29,6 +29,10 @@ async function confirmDelete() {
   deleteTargetId.value = null
   isDeleteOpen.value = false
   refresh()
+  // if current page is now empyt and we're not on page 1, go back
+  if (events.value.length === 0 && filters.page > 1) {
+    filters.page = filters.page - 1
+  }
 }
 
 const isModalOpen = ref(false)
